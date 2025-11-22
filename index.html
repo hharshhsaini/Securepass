@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Credential Generator with Policy Controls</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Credential Generator</h1>
+      <p>Generate secure passwords using customizable policy controls</p>
+    </header>
+
+    <main>
+      <section class="policy">
+        <h2>Policy Controls</h2>
+        <div class="row">
+          <label>Length: <input id="length" type="number" min="4" max="128" value="16" /></label>
+          <label>Min Uppercase: <input id="upper" type="number" min="0" max="64" value="1" /></label>
+          <label>Min Lowercase: <input id="lower" type="number" min="0" max="64" value="1" /></label>
+          <label>Min Digits: <input id="digits" type="number" min="0" max="64" value="1" /></label>
+          <label>Min Symbols: <input id="symbols" type="number" min="0" max="64" value="1" /></label>
+        </div>
+        <div class="row">
+          <label><input id="avoid_similar" type="checkbox" checked /> Avoid similar characters (I,l,0,O)</label>
+          <label><input id="no_repeating" type="checkbox" /> No immediate repeating chars</label>
+        </div>
+
+        <div class="controls">
+          <button id="generateBtn">Generate</button>
+          <button id="copyBtn" disabled>Copy</button>
+          <button id="examplePolicy">Load Example Policy</button>
+        </div>
+        <div id="policyMsg" class="msg"></div>
+      </section>
+
+      <section class="result">
+        <h2>Result</h2>
+        <div class="output" id="output">—</div>
+        <div class="meta">
+          <span id="entropy">Entropy: —</span>
+          <span id="strength">Strength: —</span>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <small>Harsh Saini & Aditya Chauhan — Credential Generator with Policy Controls</small>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
