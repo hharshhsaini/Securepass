@@ -1,0 +1,23 @@
+{
+  "name": "credential-generator",
+  "version": "2.0.0",
+  "description": "Production-quality credential generator with policy controls, AI integration, and password history",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "password-generator",
+    "credentials",
+    "security",
+    "ai",
+    "gemini"
+  ],
+  "author": "Harsh Saini & Aditya Chauhan",
+  "license": "MIT"
+}
