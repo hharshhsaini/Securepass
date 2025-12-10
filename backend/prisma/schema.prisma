@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String?  @unique
+  passwordHash String?  // null for OAuth-only users
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Per-user encryption key wrapped with server MASTER_KEY (AES-256-GCM)
+  // Format: base64(iv + authTag + encryptedKey)
+  wrappedKey String?
+
+  oauthProviders OAuthProvider[]
+  vaultEntries   VaultEntry[]
+  refreshTokens  RefreshToken[]
+}
+
+model OAuthProvider {
+  id           String  @id @default(uuid())
+  provider     String  // 'google' or 'github'
+  providerId   String  // unique ID from the OAuth provider
+  accessToken  String? // encrypted if stored (optional)
+  refreshToken String? // encrypted if stored (optional)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([provider, providerId])
+}
+
+model VaultEntry {
+  id       String @id @default(uuid())
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+
+  title    String
+  username String
+  site     String?
+  notes    String?
+
+  // Encrypted password data (AES-256-GCM)
+  passwordCiphertext String // base64 encoded ciphertext
+  iv                 String // base64 encoded initialization vector
+  tag                String // base64 encoded authentication tag
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   // SHA-256 hash of the actual token
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([tokenHash])
+  @@index([userId])
+}

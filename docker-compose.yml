@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: securepass-db
+    environment:
+      POSTGRES_USER: securepass
+      POSTGRES_PASSWORD: securepass
+      POSTGRES_DB: securepass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U securepass"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build: ./backend
+    container_name: securepass-api
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DATABASE_URL=postgresql://securepass:securepass@db:5432/securepass
+      - JWT_SECRET=${JWT_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - MASTER_KEY=${MASTER_KEY}
+      - BCRYPT_SALT_ROUNDS=12
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost:3000}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:-http://localhost:4000/api/auth/google/callback}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:-http://localhost:4000/api/auth/github/callback}
+      - OAUTH_SUCCESS_REDIRECT=${OAUTH_SUCCESS_REDIRECT:-http://localhost:3000/oauth-success}
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Optional: Frontend (static files served by nginx)
+  # Uncomment if you want to serve the frontend via Docker
+  # frontend:
+  #   image: nginx:alpine
+  #   container_name: securepass-frontend
+  #   volumes:
+  #     - ./:/usr/share/nginx/html:ro
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+
+volumes:
+  db_data:
