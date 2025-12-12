@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Generate secure passwords with custom policies and AI assistance">
   <title>SecurePass Studio - Password Generator</title>
-  
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="styles/main.css">
-  
+
   <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
+
 <body>
   <!-- Animated Background Orbs -->
   <div class="orb orb-1"></div>
@@ -28,12 +30,12 @@
     <div class="nav-content">
       <a href="#" class="logo">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
         <span>SecurePass</span>
       </a>
-      
+
       <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#game">Mini Game</a>
@@ -52,7 +54,8 @@
     <section id="hero" class="hero">
       <div class="hero-content">
         <h1><span class="highlight">SecurePass</span> Studio</h1>
-        <p class="tagline">Generate bulletproof passwords with custom policies, strength analysis, and AI assistance.</p>
+        <p class="tagline">Generate bulletproof passwords with custom policies, strength analysis, and AI assistance.
+        </p>
         <div class="hero-buttons">
           <a href="#generator" class="btn primary">🔐 Generate Password</a>
           <a href="#game" class="btn secondary">🎮 Play Mini Game</a>
@@ -65,38 +68,38 @@
       <div class="container">
         <h2>Why <span class="highlight">SecurePass</span>?</h2>
         <p class="section-desc">Everything you need to create and manage secure passwords</p>
-        
+
         <div class="feature-grid">
           <div class="feature-card">
             <div class="feature-icon">🛡️</div>
             <h3>Policy Controls</h3>
             <p>Set length, uppercase, lowercase, digits, and symbols requirements.</p>
           </div>
-          
+
           <div class="feature-card">
             <div class="feature-icon">📊</div>
             <h3>Strength Meter</h3>
             <p>Visual strength bar with entropy calculation in bits.</p>
           </div>
-          
+
           <div class="feature-card">
             <div class="feature-icon">🤖</div>
             <h3>AI Assistant</h3>
             <p>Describe what you need and let AI generate a custom password.</p>
           </div>
-          
+
           <div class="feature-card">
             <div class="feature-icon">📜</div>
             <h3>History & Undo</h3>
             <p>All passwords saved locally with search, sort, and undo support.</p>
           </div>
-          
+
           <div class="feature-card">
             <div class="feature-icon">📱</div>
             <h3>Responsive</h3>
             <p>Works great on desktop, tablet, and mobile devices.</p>
           </div>
-          
+
           <div class="feature-card">
             <div class="feature-icon">⌨️</div>
             <h3>Keyboard Shortcuts</h3>
@@ -111,7 +114,7 @@
       <div class="container">
         <h2>Password <span class="highlight">Challenge</span></h2>
         <p class="section-desc">Test your typing speed with our mini game!</p>
-        
+
         <div class="game-layout">
           <div class="game-box">
             <!-- Score Display -->
@@ -129,22 +132,22 @@
                 <span id="gameTimer" class="stat-value">10</span>
               </div>
             </div>
-            
+
             <!-- Game Area -->
             <p id="gameInstruction" class="game-instruction">Type the password as fast as you can!</p>
             <div id="gamePassword" class="game-password">Press Start to Play</div>
             <input type="text" id="gameInput" class="game-input" placeholder="Type here..." disabled autocomplete="off">
             <p id="gameFeedback" class="game-feedback"></p>
-            
+
             <!-- Game Buttons -->
             <div class="game-buttons">
               <button id="gameStartBtn" class="btn primary">▶ Start Game</button>
               <button id="gameRestartBtn" class="btn secondary" disabled>🔄 Restart</button>
             </div>
-            
+
             <p class="high-score">🏆 High Score: <span id="gameHighScore">0</span></p>
           </div>
-          
+
           <!-- Game Tips -->
           <div class="game-tips">
             <h4>How to Play</h4>
@@ -164,15 +167,15 @@
       <div class="container">
         <h2>Generate Your <span class="highlight">Password</span></h2>
         <p class="section-desc">Customize your password with powerful policy controls</p>
-        
+
         <div class="generator-grid">
           <!-- Left Column: Controls -->
           <div class="generator-controls">
-            
+
             <!-- Policy Card -->
             <div class="card">
               <h3>🛡️ Policy Controls</h3>
-              
+
               <form id="policyForm">
                 <div class="form-row">
                   <label>
@@ -196,7 +199,7 @@
                     <input type="number" id="minSymbols" min="0" max="64" value="1">
                   </label>
                 </div>
-                
+
                 <div class="checkbox-row">
                   <label class="checkbox">
                     <input type="checkbox" id="avoidSimilar" checked>
@@ -207,9 +210,9 @@
                     <span>No repeating characters</span>
                   </label>
                 </div>
-                
+
                 <p id="policyError" class="error-msg"></p>
-                
+
                 <div class="button-row">
                   <button type="button" id="generateBtn" class="btn primary">🔑 Generate</button>
                   <button type="button" id="copyBtn" class="btn secondary" disabled>📋 Copy</button>
@@ -217,11 +220,13 @@
                 </div>
               </form>
             </div>
-            
+
             <!-- AI Card -->
             <div class="card ai-card">
               <h3>🤖 AI Password Generator <span class="badge">Gemini</span></h3>
-              <textarea id="aiPrompt" placeholder="Describe the password you want... e.g., 'A strong password for my bank account'" rows="3"></textarea>
+              <textarea id="aiPrompt"
+                placeholder="Describe the password you want... e.g., 'A strong password for my bank account'"
+                rows="3"></textarea>
               <p class="hint">Press Enter to generate, Shift+Enter for new line</p>
               <p id="aiError" class="error-msg"></p>
               <button type="button" id="aiGenerateBtn" class="btn ai-btn">
@@ -230,19 +235,19 @@
               </button>
             </div>
           </div>
-          
+
           <!-- Right Column: Results -->
           <div class="generator-results">
-            
+
             <!-- Result Card -->
             <div class="card">
               <h3>✅ Generated Password</h3>
-              
+
               <div class="password-output">
                 <output id="passwordOutput" class="password-display">—</output>
                 <button type="button" id="toggleVisibility" class="icon-btn" title="Toggle visibility">👁️</button>
               </div>
-              
+
               <!-- Strength Meter -->
               <div class="strength-meter">
                 <div class="strength-bar">
@@ -258,14 +263,14 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- History Card -->
             <div class="card">
               <div class="card-header">
                 <h3>📜 Password History</h3>
                 <button type="button" id="clearHistoryBtn" class="btn ghost small">Clear All</button>
               </div>
-              
+
               <div class="history-controls">
                 <input type="search" id="historySearch" placeholder="🔍 Search history...">
                 <select id="historySort">
@@ -277,13 +282,13 @@
                   <option value="shortest">Shortest First</option>
                 </select>
               </div>
-              
+
               <div id="historyList" class="history-list">
                 <div class="history-empty">
                   <p>📝 No passwords generated yet</p>
                 </div>
               </div>
-              
+
               <div id="pagination" class="pagination hidden">
                 <button type="button" id="prevPage" class="btn ghost small" disabled>← Prev</button>
                 <span id="pageInfo">Page 1 of 1</span>
@@ -348,19 +353,19 @@
       </div>
       <div class="modal-body">
         <p class="contact-intro">Have a question, feedback, or just want to say hi? Fill out the form below!</p>
-        
+
         <form id="contactForm" class="contact-form">
-          
+
           <div class="form-group">
             <label for="contactName">Your Name *</label>
             <input type="text" id="contactName" name="name" placeholder="John Doe" required>
           </div>
-          
+
           <div class="form-group">
             <label for="contactEmail">Your Email *</label>
             <input type="email" id="contactEmail" name="email" placeholder="john@example.com" required>
           </div>
-          
+
           <div class="form-group">
             <label for="contactSubject">Subject *</label>
             <select id="contactSubject" name="subject" required>
@@ -373,30 +378,32 @@
               <option value="Other">Other</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="contactMessage">Message *</label>
-            <textarea id="contactMessage" name="message" placeholder="Write your message here..." rows="4" required></textarea>
+            <textarea id="contactMessage" name="message" placeholder="Write your message here..." rows="4"
+              required></textarea>
           </div>
-          
+
           <div class="form-group checkbox-group">
             <label class="checkbox">
               <input type="checkbox" id="contactNewsletter" name="newsletter" value="yes">
               <span>Keep me updated about new features</span>
             </label>
           </div>
-          
+
           <button type="submit" class="btn primary contact-submit">
             <span class="btn-text">📤 Send Message</span>
             <span class="spinner hidden"></span>
           </button>
         </form>
-        
+
         <div id="contactSuccess" class="contact-success hidden">
           <div class="success-icon">✅</div>
           <h4>Message Sent!</h4>
           <p>Thanks for reaching out! I'll get back to you as soon as possible.</p>
-          <button type="button" class="btn secondary" onclick="document.getElementById('contactModal').close()">Close</button>
+          <button type="button" class="btn secondary"
+            onclick="document.getElementById('contactModal').close()">Close</button>
         </div>
       </div>
     </div>
@@ -404,11 +411,11 @@
 
   <!-- Scripts -->
   <script type="module" src="js/main.js"></script>
-  
+
   <!-- Auth Check Script -->
   <script>
     // Check if user is logged in and update nav
-    (function() {
+    (function () {
       const session = localStorage.getItem('securepass_session');
       if (session) {
         try {
@@ -421,9 +428,10 @@
               `;
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     })();
   </script>
 </body>
+
 </html>

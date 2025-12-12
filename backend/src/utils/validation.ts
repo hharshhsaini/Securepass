@@ -25,15 +25,16 @@ export const loginSchema = z.object({
 
 export const createPasswordSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),
-  username: z.string().min(1, 'Username is required').max(255),
+  username: z.string().max(255).optional().or(z.literal('')),
   password: z.string().min(1, 'Password is required'),
   site: z.string().url('Invalid URL').optional().or(z.literal('')),
-  notes: z.string().max(5000).optional()
+  notes: z.string().max(5000).optional(),
+  tags: z.array(z.string()).optional()
 });
 
 export const updatePasswordSchema = z.object({
   title: z.string().min(1).max(255).optional(),
-  username: z.string().min(1).max(255).optional(),
+  username: z.string().max(255).optional().or(z.literal('')),
   password: z.string().min(1).optional(),
   site: z.string().url('Invalid URL').optional().or(z.literal('')).or(z.null()),
   notes: z.string().max(5000).optional().or(z.null())

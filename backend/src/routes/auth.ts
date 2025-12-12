@@ -85,14 +85,14 @@ router.post(
 router.post('/logout', async (req: Request, res: Response): Promise<void> => {
   try {
     const refreshToken = req.cookies[REFRESH_COOKIE];
-    
+
     if (refreshToken) {
       await logout(refreshToken);
     }
 
     // Clear the cookie
     res.clearCookie(REFRESH_COOKIE, { path: '/api/auth' });
-    
+
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
     // Still clear cookie even if DB operation fails
@@ -108,7 +108,7 @@ router.post('/logout', async (req: Request, res: Response): Promise<void> => {
 router.post('/refresh', async (req: Request, res: Response): Promise<void> => {
   try {
     const refreshToken = req.cookies[REFRESH_COOKIE];
-    
+
     if (!refreshToken) {
       res.status(401).json({ error: 'Refresh token not found' });
       return;
@@ -133,7 +133,7 @@ router.post('/refresh', async (req: Request, res: Response): Promise<void> => {
 router.get('/me', requireAuth, async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await getUserById(req.userId!);
-    
+
     if (!user) {
       res.status(404).json({ error: 'User not found' });
       return;
@@ -152,9 +152,9 @@ router.get('/me', requireAuth, async (req: Request, res: Response): Promise<void
  */
 router.get(
   '/google',
-  passport.authenticate('google', { 
+  passport.authenticate('google', {
     scope: ['profile', 'email'],
-    session: false 
+    session: false
   })
 );
 
@@ -164,7 +164,7 @@ router.get(
  */
 router.get(
   '/google/callback',
-  passport.authenticate('google', { 
+  passport.authenticate('google', {
     session: false,
     failureRedirect: `${process.env.FRONTEND_ORIGIN || ''}/login?error=oauth_failed`
   }),
@@ -177,9 +177,9 @@ router.get(
  */
 router.get(
   '/github',
-  passport.authenticate('github', { 
+  passport.authenticate('github', {
     scope: ['user:email'],
-    session: false 
+    session: false
   })
 );
 
@@ -189,7 +189,7 @@ router.get(
  */
 router.get(
   '/github/callback',
-  passport.authenticate('github', { 
+  passport.authenticate('github', {
     session: false,
     failureRedirect: `${process.env.FRONTEND_ORIGIN || ''}/login?error=oauth_failed`
   }),
@@ -203,7 +203,7 @@ function handleOAuthCallback(req: Request, res: Response): void {
   try {
     // req.user contains { user, tokens } from passport strategy
     const authResult = req.user as { user: UserResponse; tokens: AuthTokens };
-    
+
     if (!authResult || !authResult.tokens) {
       res.redirect(`${process.env.FRONTEND_ORIGIN || ''}/login?error=oauth_failed`);
       return;
@@ -214,9 +214,9 @@ function handleOAuthCallback(req: Request, res: Response): void {
 
     // Redirect to frontend success page
     // Frontend will call /api/auth/me to get user info
-    const redirectUrl = process.env.OAUTH_SUCCESS_REDIRECT || 
-      `${process.env.FRONTEND_ORIGIN || ''}/oauth-success`;
-    
+    const redirectUrl = process.env.OAUTH_SUCCESS_REDIRECT ||
+      `${process.env.FRONTEND_ORIGIN || ''}/oauth-success.html`;
+
     res.redirect(redirectUrl);
   } catch (error) {
     res.redirect(`${process.env.FRONTEND_ORIGIN || ''}/login?error=oauth_failed`);

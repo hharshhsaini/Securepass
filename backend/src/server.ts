@@ -12,6 +12,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Validate security configuration before starting
+import { validateAndLog } from './utils/validateEnv';
+validateAndLog();
+
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -22,6 +26,10 @@ import passport from 'passport';
 import { initializePassport } from './config/passport';
 import authRoutes from './routes/auth';
 import passwordRoutes from './routes/passwords';
+import collectionRoutes from './routes/collections';
+import tagRoutes from './routes/tags';
+import auditRoutes from './routes/audit';
+import sharingRoutes from './routes/sharing';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -71,6 +79,10 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/passwords', passwordRoutes);
+app.use('/api/collections', collectionRoutes);
+app.use('/api/tags', tagRoutes);
+app.use('/api/audit', auditRoutes);
+app.use('/api/share', sharingRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -84,10 +96,12 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🔐 SecurePass API running on port ${PORT}`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`   Frontend origin: ${process.env.FRONTEND_ORIGIN || 'http://localhost:3000'}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🔐 SecurePass API running on port ${PORT}`);
+    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   Frontend origin: ${process.env.FRONTEND_ORIGIN || 'http://localhost:3000'}`);
+  });
+}
 
 export default app;

@@ -208,3 +208,10 @@ __marimo__/
 
 # API config file (generated from .env)
 config.js
+
+# Node.js
+node_modules/
+npm-debug.log
+
+# OS
+.DS_Store

@@ -127,155 +127,116 @@ docker-compose exec backend npx prisma migrate deploy
 | PUT | `/api/passwords/:id` | Update entry |
 | DELETE | `/api/passwords/:id` | Delete entry |
 
-## OAuth Setup
+## OAuth Setup (Detailed)
 
 ### Google OAuth
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Navigate to **APIs & Services** → **Credentials**
-4. Click **Create Credentials** → **OAuth client ID**
-5. Select **Web application**
-6. Add authorized redirect URI:
-   - Development: `http://localhost:4000/api/auth/google/callback`
-   - Production: `https://your-domain.com/api/auth/google/callback`
-7. Copy **Client ID** and **Client Secret** to `.env`
+1. Go to [Google Cloud Console](https://console.cloud.google.com/).
+2. Create `SecurePass` project.
+3. **APIs & Services > Credentials** > **Create Credentials** > **OAuth Client ID**.
+4. Application Type: **Web application**.
+5. **Authorized JavaScript origins**: `http://localhost:3000` (Local Frontend) and `http://localhost:4000` (Backend).
+6. **Authorized redirect URIs**:
+   - Local: `http://localhost:4000/api/auth/google/callback`
+   - Prod: `https://api.yourdomain.com/api/auth/google/callback`
+7. Copy `Client ID` and `Client Secret` to `.env`.
 
 ### GitHub OAuth
+1. Go to **Settings > Developer settings > OAuth Apps**.
+2. **New OAuth App**.
+3. Homepage URL: `http://localhost:3000`.
+4. Authorization callback URL:
+   - Local: `http://localhost:4000/api/auth/github/callback`
+   - Prod: `https://api.yourdomain.com/api/auth/github/callback`
+5. Copy `Client ID` and Generate `Client Secret`.
 
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Click **New OAuth App**
-3. Fill in:
-   - Application name: SecurePass
-   - Homepage URL: `http://localhost:3000`
-   - Authorization callback URL: `http://localhost:4000/api/auth/github/callback`
-4. Copy **Client ID** and generate **Client Secret**
-5. Add to `.env`
+### Troubleshooting OAuth
+- **Cookie not set**: Ensure `FRONTEND_ORIGIN` matches exactly what you see in the browser URL bar.
+- **SameSite Strict**: In dev (http), we use `SameSite=Lax`. In prod (https), we can use `Strict` if frontend/backend share the top-level domain. If cross-domain, must use `SameSite=None` + `Secure`.
+- **CORS Error**: Ensure `credentials: true` is sent by frontend (axios/fetch) and `Access-Control-Allow-Credentials: true` is returned by backend.
 
-## Frontend Integration
+---
 
-### OAuth Flow
+## 🔧 Environment Variables
 
-```javascript
-// Redirect to OAuth provider
-window.location.href = 'http://localhost:4000/api/auth/google';
+Required variables in `backend/.env`. **DO NOT COMMIT THIS FILE.**
 
-// After OAuth callback, frontend receives redirect to /oauth-success
-// Then fetch user data:
-const response = await fetch('http://localhost:4000/api/auth/me', {
-  credentials: 'include', // Include cookies
-  headers: {
-    'Authorization': `Bearer ${accessToken}` // If you have it
-  }
-});
-```
+| Variable | Description | Example / command to generate |
+|---|---|---|
+| `PORT` | API Port | `4000` |
+| `DATABASE_URL` | PostgreSQL Connection | `postgresql://user:pass@localhost:5432/db` |
+| `FRONTEND_ORIGIN` | CORS Origin for Frontend | `http://localhost:3000` |
+| `MASTER_KEY` | 32-byte Base64 Key for wrapping | `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+| `JWT_SECRET` | Signing Access Tokens | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `REFRESH_TOKEN_SECRET` | Signing Refresh Tokens | `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` |
+| `GOOGLE_CLIENT_ID` | OAuth ID | From Google Console |
+| `GOOGLE_CLIENT_SECRET` | OAuth Secret | From Google Console |
+| `GITHUB_CLIENT_ID` | OAuth ID | From GitHub Settings |
+| `GITHUB_CLIENT_SECRET` | OAuth Secret | From GitHub Settings |
 
-### Token Refresh
+---
 
-```javascript
-// When access token expires (401 response)
-async function refreshToken() {
-  const response = await fetch('http://localhost:4000/api/auth/refresh', {
-    method: 'POST',
-    credentials: 'include' // Sends httpOnly cookie
-  });
-  
-  if (response.ok) {
-    const { accessToken } = await response.json();
-    // Store new access token in memory
-    return accessToken;
-  }
-  
-  // Refresh failed - redirect to login
-  window.location.href = '/login';
-}
-```
+## 🐳 Docker & Local Testing
 
-### API Calls with Auth
-
-```javascript
-async function fetchPasswords(accessToken) {
-  const response = await fetch('http://localhost:4000/api/passwords', {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include'
-  });
-  
-  if (response.status === 401) {
-    // Token expired - refresh and retry
-    const newToken = await refreshToken();
-    return fetchPasswords(newToken);
-  }
-  
-  return response.json();
-}
-```
-
-## Testing
+### Running with Docker Compose
+To spin up both Postgres and the Backend fully containerized:
 
 ```bash
-# Run all tests
-npm test
-
-# Run with coverage
-npm test -- --coverage
-
-# Run specific test file
-npm test -- encryption.test.ts
+# In project root
+docker-compose up --build
 ```
 
-### Manual Testing with cURL
+The API will be available at `http://localhost:4000`.
+Note: You must still configure `.env` in the `backend/` folder or pass them via `docker-compose.yml`.
 
-```bash
-# Register
-curl -X POST http://localhost:4000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"StrongPass123!"}'
+### Testing OAuth in Development
+1. Start Backend: `npm run dev` (Port 4000)
+2. Start Frontend: `npx serve . -l 3000` (Port 3000)
+3. Visit `http://localhost:3000/login.html`
+4. Click "Continue with Google" -> Redirects to Accounts -> Redirects back to `localhost:3000/dashboard.html`.
+5. Check DevTools > Application > Cookies: `refresh_token` should be present (HttpOnly).
 
-# Login (saves cookies)
-curl -X POST http://localhost:4000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{"email":"test@example.com","password":"StrongPass123!"}'
+---
 
-# Create password (use access token from login response)
-curl -X POST http://localhost:4000/api/passwords \
-  -H "Authorization: Bearer <access_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Gmail","username":"user@gmail.com","password":"secret123","site":"https://gmail.com"}'
+## 🔐 Security Tradeoffs
 
-# List passwords
-curl http://localhost:4000/api/passwords \
-  -H "Authorization: Bearer <access_token>"
+### 1. Server-Side Key Wrapping (Current Architecture)
+- **How it works**: User's encryption key is stored in DB but encrypted (wrapped) by a `MASTER_KEY` held by the application.
+- **Pros**: 
+  - User doesn't lose data if they forget their password.
+  - Easier multi-device sync.
+  - Backend can process data (e.g. Health Check) without user interaction if needed (though we currently decrypt on demand).
+- **Cons**: 
+  - If `MASTER_KEY` and DB are both compromised, attacker can decrypt everything.
+- **Mitigation**: Use a Hardware Security Module (HSM) or Cloud KMS (AWS/GCP) to hold the `MASTER_KEY` so it never exists in plaintext memory/env vars.
 
-# Refresh token
-curl -X POST http://localhost:4000/api/auth/refresh \
-  -b cookies.txt
-```
+### 2. Client-Side Encryption (Zero-Knowledge)
+- **How it works**: Key is derived from Master Password on client (PBKDF2/Argon2). Server never sees the key.
+- **Pros**:
+  - True Zero-Knowledge. Server breach reveals nothing but blobs.
+- **Cons**:
+  - Forget password = **Permanent Data Loss**.
+  - No backend features like "Password Health" without sending keys to server or running heavy logic in browser.
 
-## Security Considerations
+> **Recommendation**: For Enterprise/High-Value targets, move to **KMS-based unlocking** of the Master Key, or offer a "Client-Side Only" mode for paranoid users (Roadmap Item).
 
-### Production Checklist
+---
 
-- [ ] Use strong, unique values for `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `MASTER_KEY`
-- [ ] Enable HTTPS (set `secure: true` for cookies)
-- [ ] Configure proper CORS origins
-- [ ] Use a secrets manager (AWS Secrets Manager, HashiCorp Vault) for `MASTER_KEY`
-- [ ] Consider using KMS (AWS KMS, GCP KMS) for key wrapping
-- [ ] Enable database encryption at rest
-- [ ] Set up proper logging and monitoring
-- [ ] Regular security audits
+## 🔄 Migration & Production Plan
 
-### Key Management
+### Rotating MASTER_KEY
+If the `MASTER_KEY` is compromised:
+1. Put API in Maintenance Mode.
+2. Script: Fetch all users' `wrappedKey`.
+3. Unwrap using OLD Master Key.
+4. Wrap using NEW Master Key.
+5. Update DB and Restart Server with NEW Key.
 
-The current implementation stores `MASTER_KEY` in environment variables. For production:
+### Data Backup
+- **Regular Dump**: `pg_dump securepass > backup.sql`.
+- **JSON Export**: Admin tool to pull all decrypted vaults (requires Master Key).
 
-1. **AWS**: Use AWS KMS to wrap/unwrap per-user keys
-2. **GCP**: Use Cloud KMS
-3. **Self-hosted**: Use HashiCorp Vault
+---
 
 ## License
-
 MIT
+
