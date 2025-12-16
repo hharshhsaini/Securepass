@@ -33,48 +33,68 @@ let currentFilter = {};
 document.addEventListener('DOMContentLoaded', async function () {
   console.log('Dashboard loading...');
 
-  // Check authentication
-  const session = getSession();
-  if (!session) {
-    console.log('No session, guest mode');
-    // window.location.href = 'login.html'; // Allow guest access
-  }
-
-  currentUser = session;
-  console.log('User session found:', currentUser.name);
-
-  // Try to initialize API
-  if (window.SecurePassAPI) {
-    try {
-      await window.SecurePassAPI.initAPI();
-      apiReady = true;
-      console.log('API connected successfully');
-    } catch (e) {
-      console.log('API not available, using local storage mode');
-      apiReady = false;
+  try {
+    // Check authentication
+    const session = getSession();
+    if (!session) {
+      console.log('No session, guest mode');
     }
+
+    currentUser = session || {
+      name: 'Guest User',
+      email: 'guest@local',
+      userId: 'guest_' + Math.floor(Math.random() * 1000000),
+      isGuest: true
+    };
+    console.log('User session:', currentUser.name, currentUser.isGuest ? '(Guest)' : '(Authenticated)');
+
+    // Setup UI - Do this FIRST so UI is responsive even if API fails
+    setupNavigation();
+    setupUserInfo();
+    setupLogout();
+    setupGenerator();
+    setupVaultSearch();
+    setupVaultFilters();
+    setupSaveModal();
+    setupBulkActions();
+
+    // Try to initialize API
+    if (window.SecurePassAPI) {
+      try {
+        const result = await window.SecurePassAPI.initAPI();
+        if (result && result.accessToken) {
+          apiReady = true;
+          console.log('API connected successfully');
+        } else {
+          console.log('API initialization returned no token, using local mode');
+          apiReady = false;
+        }
+      } catch (e) {
+        console.log('API not available, using local storage mode');
+        apiReady = false;
+      }
+    }
+
+    // Load data
+    await loadCollections();
+    await loadTags();
+    await loadOverviewStats();
+    await loadVault();
+    await loadRecentPasswords();
+    await loadPasswordHealth();
+
+    console.log('Dashboard ready!');
+  } catch (err) {
+    console.error('Critical Dashboard Error:', err);
+    alert('Dashboard failed to load: ' + err.message);
   }
-
-  // Setup UI
-  setupNavigation();
-  setupUserInfo();
-  setupLogout();
-  setupGenerator();
-  setupVaultSearch();
-  setupVaultFilters();
-  setupSaveModal();
-  setupBulkActions();
-
-  // Load data
-  await loadCollections();
-  await loadTags();
-  await loadOverviewStats();
-  await loadVault();
-  await loadRecentPasswords();
-  await loadPasswordHealth();
-
-  console.log('Dashboard ready!');
 });
+
+// Global error handler for runtime errors
+window.onerror = function (msg, url, line) {
+  console.error('Global Error:', msg, url, line);
+  // Optional: showToast('System Error: ' + msg, 'error');
+};
 
 // ============ SESSION ============
 
