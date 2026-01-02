@@ -107,15 +107,14 @@ cd backend
 npm run dev
 # Runs on http://localhost:4000
 
-# Terminal 2: Frontend
-cd ..
-npx serve . -l 3000
-# Runs on http://localhost:3000
+# Terminal 2: Frontend (from project root)
+npm run dev
+# Runs on http://localhost:5173
 ```
 
 ### 4. Test
 
-Open http://localhost:3000 and register a new account!
+Open http://localhost:5173 and register a new account!
 
 ## 🔧 Configuration
 
@@ -125,7 +124,7 @@ Open http://localhost:3000 and register a new account!
 # Server
 PORT=4000
 NODE_ENV=development
-FRONTEND_ORIGIN=http://localhost:3000
+FRONTEND_ORIGIN=http://localhost:5173
 
 # Database
 DATABASE_URL=postgresql://securepass:securepass@localhost:5432/securepass

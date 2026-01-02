@@ -40,10 +40,6 @@
         <a href="#features">Features</a>
         <a href="#game">Mini Game</a>
         <a href="#generator">Generator</a>
-        <div class="nav-auth" id="navAuth">
-          <a href="login.html" class="btn ghost">Login</a>
-          <a href="register.html" class="btn primary">Sign Up</a>
-        </div>
         <button id="themeBtn" class="theme-btn" title="Toggle theme">🌙</button>
       </div>
     </div>
@@ -411,27 +407,6 @@
 
   <!-- Scripts -->
   <script type="module" src="js/main.js"></script>
-
-  <!-- Auth Check Script -->
-  <script>
-    // Check if user is logged in and update nav
-    (function () {
-      const session = localStorage.getItem('securepass_session');
-      if (session) {
-        try {
-          const data = JSON.parse(session);
-          if (new Date(data.expiresAt) > new Date()) {
-            const navAuth = document.getElementById('navAuth');
-            if (navAuth) {
-              navAuth.innerHTML = `
-                <a href="dashboard.html" class="btn primary">📊 Dashboard</a>
-              `;
-            }
-          }
-        } catch (e) { }
-      }
-    })();
-  </script>
 </body>
 
 </html>
